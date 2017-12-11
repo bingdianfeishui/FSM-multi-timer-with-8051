@@ -12,13 +12,13 @@
       <ToolsetName>MCS-51</ToolsetName>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STC90C58AD</Device>
+          <Device>STC90C58RD+</Device>
           <Vendor>STC</Vendor>
-          <Cpu>IRAM(0-0xFF) XRAM(0-0xFFF) IROM(0-0x7FFF) CLOCK(45000000) MODP2</Cpu>
+          <Cpu>IRAM(0-0xFF) XRAM(0-0x3FF) IROM(0-0x7FFF) CLOCK(45000000) MODP2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile>"LIB\STARTUP.A51" ("Standard 8051 Startup Code")</StartupFile>
           <FlashDriverDll></FlashDriverDll>
-          <DeviceId>61800</DeviceId>
+          <DeviceId>61736</DeviceId>
           <RegisterFile>STC90C5xAD.H</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
@@ -44,7 +44,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\output\</OutputDirectory>
-          <OutputName>MultiTimerClock</OutputName>
+          <OutputName>lesson10</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -103,11 +103,11 @@
           <SimDllName>S8051.DLL</SimDllName>
           <SimDllArguments></SimDllArguments>
           <SimDlgDll>DP51.DLL</SimDlgDll>
-          <SimDlgDllArguments>-p51</SimDlgDllArguments>
+          <SimDlgDllArguments>-p52</SimDlgDllArguments>
           <TargetDllName>S8051.DLL</TargetDllName>
           <TargetDllArguments></TargetDllArguments>
           <TargetDlgDll>TP51.DLL</TargetDlgDll>
-          <TargetDlgDllArguments>-p51</TargetDlgDllArguments>
+          <TargetDlgDllArguments>-p52</TargetDlgDllArguments>
         </DllOption>
         <DebugOption>
           <OPTHX>
@@ -168,7 +168,7 @@
           </Flash1>
           <bUseTDR>0</bUseTDR>
           <Flash2></Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
         </Utilities>
         <Target51>
@@ -181,7 +181,7 @@
             <UseOnchipRom>0</UseOnchipRom>
             <UseOnchipArithmetic>0</UseOnchipArithmetic>
             <UseMultipleDPTR>0</UseMultipleDPTR>
-            <UseOnchipXram>1</UseOnchipXram>
+            <UseOnchipXram>0</UseOnchipXram>
             <HadIRAM>1</HadIRAM>
             <HadXRAM>1</HadXRAM>
             <HadIROM>1</HadIROM>
@@ -268,7 +268,7 @@
               <XRA>
                 <Type>0</Type>
                 <StartAddress>0x0</StartAddress>
-                <Size>0x1000</Size>
+                <Size>0x400</Size>
               </XRA>
               <XRA512>
                 <Type>0</Type>
@@ -299,7 +299,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\lib</IncludePath>
+              <IncludePath>..\lib;C:\Keil\C51\INC</IncludePath>
             </VariousControls>
           </C51>
           <Ax51>
@@ -349,42 +349,32 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>New Group</GroupName>
+          <GroupName>Source Group 1</GroupName>
           <Files>
+            <File>
+              <FileName>Delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\lib\Delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>DS1302.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\lib\DS1302.c</FilePath>
+            </File>
+            <File>
+              <FileName>Display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\Display.c</FilePath>
+            </File>
             <File>
               <FileName>key.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\key.c</FilePath>
             </File>
             <File>
-              <FileName>main.c</FileName>
+              <FileName>lesson10_2.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>Delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\lib\Delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>DS1302.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\lib\DS1302.c</FilePath>
-            </File>
-            <File>
-              <FileName>Display595.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\Display595.c</FilePath>
-            </File>
-            <File>
-              <FileName>ISP.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\ISP.c</FilePath>
-            </File>
-            <File>
-              <FileName>STC_eeprom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\lib\STC_eeprom.c</FilePath>
+              <FilePath>.\src\lesson10_2.c</FilePath>
             </File>
           </Files>
         </Group>
