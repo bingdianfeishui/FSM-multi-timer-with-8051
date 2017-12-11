@@ -1,0 +1,15 @@
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.git
+.git/
+/lst
+*.obj
+!/output/MultiTimerClock.hex
+.DBK
+log.*
+.uvopt
+.bak
+.PWI
+*sublime*
