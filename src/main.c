@@ -6,12 +6,10 @@
  *@Tittle		:	基于状态机的双按键多功能闹钟
  *@Version		:	v1.1
  *@Author		:	Liy
- *@Dat			:	2017-12-12 00:46:10
+ *@Dat			:	2016-9-12 00:46:10
  *@Desctription	:	最多可设8组闹钟的时钟，可设置时、分、日期
  *					、年份。每组闹钟为在给定区间内动作相应IO口。
- *@History		:
- 	#v1.0	2016-08-14 04:47:33
- 		1. 时钟功能
+
 
  **********************************************************
  **********************************************************
@@ -20,34 +18,58 @@
 
 #include "main.h"
 
+//读取的时间
 DS1302RTC rtcTime = { 0, 0, 12, 13, 8, 6, 16};
 
+//当前程序状态
 AppState curAppState = fsmTimeDisplay;
 
+//是否扫描闹钟。可设为每分钟扫描一次，优化CPU Load。
 BOOL alarmInspect = FALSE;
-BOOL alarmOn = FALSE;
-UINT8 alarmAction = 0x00;
-UINT16 fsmTimer = 0;
-UINT8 alarmTimeNum = 0;
-UINT8 th, tl;
-
+//保存上一分钟的时间，用来优化闹钟扫描，见上。
 struct ShortTime tmpTime = {0, 0};
 
+//动作输出IO，每个IO对应1个闹钟
+UINT8 alarmAction = 0x00;
+
+//按键状态机的计时器，用于判断抖动、短按、长按
+UINT16 fsmTimer = 0; 
+
+//当前显示的闹钟序号，显示和设定闹钟时用
+UINT8 alarmTimeNum = 0;
+
+//Timer0定时器初值
+UINT8 th, tl;
+
+//系统初始化
 void InitSys();
+//闹钟时间初始化。读ISP内存(用于STC12、STC15系列有ISP功能的MCU)。
 void InitAlarmTime();
+//初始化时钟芯片
 void InitDs1302();
+//IO初始化
 void InitIO();
+//定时器0初始化
 void InitTimer0();
+//读取时间
 void GetTimeFromDS1302();
-void UpdateScreen();
+//闹钟功能看门狗
 void AlarmWatchDog();
-BOOL IsMinuteUpdate();
+//闹钟动作控制器
 void AlarmActionController();
+//是否在闹钟区间内
 BOOL IsInAlarmTimeSpan(DS1302RTC *rtcTime);
+//根据当前时间和闹钟设置，生成动作IO的值
 void GenerateAlarmAction(DS1302RTC *rtcTime);
+//按键状态机控制器
 void KeyStateController(KeyMessage *keyMsg);
+//程序状态机控制器
 void AppStateController(KeyInfo *keyInfo);
+//更新显示缓存
 void UpdateDisplayBuff();
+//刷新屏幕显示
+void UpdateScreen();
+//保存闹钟设置到ISP区。仅STC部分单片机。
 void SaveAlarmTimeSetting();
 
 void main()
@@ -74,10 +96,8 @@ void InitSys()
 	UARTInit();
 	InitAlarmTime();
 	InitDs1302();
-	// Delayx10ms(50);
 	GetTimeFromDS1302();
 	UpdateScreen();
-
 
 	alarmInspect = TRUE;
 
@@ -94,8 +114,7 @@ void InitAlarmTime()
 	{
 		SaveAlarmTimeSetting();
 	}
-	ISPArrayRead(ISP_EEPROM_ADDR + 1, 4 * MAX_ALARM_NUM, (UINT8 *)alarmDict.ShortTimeArray);
-    //ISPArrayRead(ISP_EEPROM_ADDR + 1, 4 * MAX_ALARM_NUM, (UINT8 *)dict.ShortTimeArray);
+	ISPArrayRead(ISP_EEPROM_ADDR + 1, 4 * MAX_ALARM_NUM, (UINT8 *)alarmDict.ShortTimeArray);//调试时注释，用自定义的闹钟时间调试
 }
 
 void InitIO()
@@ -137,7 +156,7 @@ void InterruptTimer0() interrupt 1
 	KeyStateController(&keyMsg);	//按键状态机控制器
 
 	counter++;
-	if (counter == TIMERCOUNTER)	//200ms
+	if (counter == TIMERCOUNTER)	//每200ms读取一次时间
 	{
 		counter = 0;
 
@@ -161,6 +180,7 @@ void GetTimeFromDS1302()
 		// 	rtcTime.RTCArray[i] = DS1302SingleRead(i);
 		// }
 
+        //分钟数或小时数不相等才开启闹钟扫描
 		if ((rtcTime.RTC.Hour != tmpTime.Hour) || (rtcTime.RTC.Minute != tmpTime.Minute))
 		{
 			alarmInspect = TRUE;
@@ -181,8 +201,7 @@ void AlarmWatchDog()
 {
 	if (alarmInspect)
 	{
-		alarmInspect = FALSE;
-		//alarmOn = IsInAlarmTimeSpan(&rtcTime);
+		//alarmInspect = FALSE; //扫描优化
 		GenerateAlarmAction(&rtcTime);
         AlarmActionController();
 	}
@@ -190,9 +209,8 @@ void AlarmWatchDog()
 
 void AlarmActionController()
 {
-    if(alarmOn)
-        ALARM_IO = alarmAction;
-	GPIO_RELAY = alarmOn ? RELAY_ON : ~RELAY_ON;
+    ALARM_IO = alarmAction;
+	GPIO_RELAY = !GPIO_RELAY;
 }
 
 BOOL IsInAlarmTimeSpan(DS1302RTC *rtc)
@@ -226,10 +244,14 @@ void GenerateAlarmAction(DS1302RTC *rtc){
 		now = rtc->RTC.Hour * 60 + rtc->RTC.Minute;
 		begin = alarmDict.AlarmTimeSetting[i].Begin.Hour * 60 + alarmDict.AlarmTimeSetting[i].Begin.Minute;
 		end = alarmDict.AlarmTimeSetting[i].End.Hour * 60 + alarmDict.AlarmTimeSetting[i].End.Minute;
-		if (now >= begin && now < end)
-			alarmAction |= 1 << i;
-        else
-            alarmAction &= ~(1 << i);
+		if (now >= begin && now < end) 
+        {
+            alarmAction |= 1 << i;
+        }
+        else 
+        {
+            alarmAction &= ~(1 << i); 
+        }       
 	}
 }
 
@@ -335,7 +357,6 @@ void AppStateController(KeyInfo *keyInfo)
 	}
 	else	//有按键则清零
 		freeTime = 0;
-
 
 	switch (curAppState)
 	{
@@ -572,6 +593,7 @@ void UpdateDisplayBuff()
 	static UINT8 tmp = 0;
 	static BOOL flashFlag = TRUE;
 
+    //根据不同的程序状态，显示不同的值
 	switch (curAppState)
 	{
 	case (fsmTimeDisplay) :

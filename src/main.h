@@ -22,7 +22,7 @@
 #define TIMERCOUNTER 20 		//定时器中断重复次数。12MHz/12T模式下20次*10ms，共200ms。count为unsigned char，此值不得超过255
 
 
-#define MAX_ALARM_NUM 	8 		//闹钟设定最大数量
+#define MAX_ALARM_NUM 	3 		//闹钟设定最大数量
 #define RELAY_ON 0 				//继电器动作时的电平
 #define KEY_FREE_TIME	1500 	//无按键空闲时间1500*10ms, 15s
 #define FLASH_LEVEL 100 		//设置界面闪烁速度控制,12T模式时建议50
@@ -60,15 +60,15 @@ union alarmDict_u
 	AlarmTime AlarmTimeSetting[MAX_ALARM_NUM];
 	struct ShortTime ShortTimeArray[MAX_ALARM_NUM * 2];
 
-} /*xdata 实机运行时取消注释*/ alarmDict = {
-	0, 10, 0, 11,
-	0, 8, 0, 9,
-	0, 10, 0, 13,
+} /*xdata 实机运行时取消注释*/ dict, alarmDict = {
+	23, 55, 23, 56,
+	23, 56, 23, 58,
+	23, 57, 23, 58/*,
 	0, 0, 0, 0,
 	0, 0, 0, 0,
     0, 0, 0, 0,
 	0, 0, 0, 0,
-    0, 0, 0, 0
+    0, 0, 0, 0*/
 };
 
 
